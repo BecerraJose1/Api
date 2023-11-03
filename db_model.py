@@ -94,6 +94,17 @@ class File3(BaseModel):
     id_ciudad: Union[int, None]
 
 
+class File3Create(BaseModel):
+    cedula: Union[int, None]
+    nombre1: Union[str, None]
+    nombre2: Union[str, None]
+    apellido1: Union[str, None]
+    apellido2: Union[str, None]
+    direccion: Union[str, None]
+    celular: Union[str, None]
+    correo: Union[str, None]
+    id_ciudad: Union[int, None]
+
 class File_ciudad(BaseModel):
     idfile_ciudad: int
     nombre_ciudad: str
