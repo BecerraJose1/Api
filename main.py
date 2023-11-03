@@ -20,7 +20,8 @@ from db_model import (
     LoginRequest,
     User,
     LoginResponse,
-    FilecCreate
+    FilecCreate,
+    File1Create
 )
 
 # API Instance
@@ -109,6 +110,71 @@ def get_filec(request: Request):
     filec = [Filec(idfilec=idfilec, comprobante=comprobante, nombre=nombre, tipo=tipo) for idfilec, comprobante, nombre, tipo in comprobantes_data ]
     return filec
 
+@app.post("/create_file1/", response_model=File1)
+def create_file1(request: Request, file1_data:File1Create):
+    # Verifica el token proporcionado
+    token = request.headers.get("Authorization")
+    if not token:
+        raise HTTPException(status_code=401, detail="No token provided")
+
+    cursor.execute("SELECT email FROM users WHERE token = %s", (token,))
+    user_email = cursor.fetchone()
+
+    if user_email is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    #El token es válido crea un registro en File1
+    try:
+        cursor.execute("INSERT INTO file1 (id_comprobante, fecha_documento, documento,id_cuenta, id_cedula, id_c_costos, factura, valor, tipo, concepto, fecha_insert, fecha_update) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (file1_data.id_comprobante ,file1_data.fecha_documento, file1_data.documento,file1_data.id_cuenta,file1_data.id_cedula,file1_data.id_c_costos ,file1_data.factura, file1_data.valor, file1_data.tipo, file1_data.concepto, file1_data.fecha_insert, file1_data.fecha_update))
+        connection.commit()
+    except mysql.connector.Error as err:
+        print(f"Error during insertion: {err}")
+    # Obtén el ID del registro recién creado
+    cursor.execute("SELECT LAST_INSERT_ID()")
+    new_id = cursor.fetchone()[0]
+
+    # Obtiene los datos del registro recién creado
+    cursor.execute("SELECT * FROM file1 WHERE idFile1 = %s", (new_id,))
+    filec_record = cursor.fetchone()
+
+    if filec_record is None:
+        raise HTTPException(status_code=500, detail="Failed to create the filec record")
+
+    # Crea un objeto Filec y lo devuelve como respuesta
+    idFile1, id_comprobante, fecha_documento, documento, id_cuenta, id_cedula, id_c_costos, factura, valor, tipo, concepto, fecha_insert, fecha_update = filec_record
+    file1 = File1(idFile1=idFile1, id_comprobante=id_comprobante, fecha_documento=fecha_documento, documento=documento, id_cuenta=id_cuenta, id_cedula=id_cedula, id_c_costos=id_c_costos, factura=factura, valor=valor, tipo=tipo, concepto=concepto, fecha_insert=fecha_insert, fecha_update=fecha_update)
+    return file1
+
+from fastapi import HTTPException
+
+@app.delete("/delete_file1/{id}")
+def delete_file1(id: int, request: Request):
+    # Verifica el token proporcionado
+    token = request.headers.get("Authorization")
+    if not token:
+        raise HTTPException(status_code=401, detail="No token provided")
+
+    cursor.execute("SELECT email FROM users WHERE token = %s", (token,))
+    user_email = cursor.fetchone()
+
+    if user_email is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    # Verifica si el registro a eliminar existe
+    cursor.execute("SELECT * FROM file1 WHERE idFile1 = %s", (id,))
+    file1_record = cursor.fetchone()
+
+    if file1_record is None:
+        raise HTTPException(status_code=404, detail="File1 record not found")
+
+    # Si el registro existe, procede a eliminarlo
+    cursor.execute("DELETE FROM file1 WHERE idFile1 = %s", (id,))
+    connection.commit()
+
+    return {"message": f"File1 record with ID {id} has been deleted"}
+
+
+
 @app.post("/create_file_c/", response_model=Filec)
 def create_filec(request: Request, filec_data: FilecCreate):
 
@@ -147,26 +213,48 @@ def create_filec(request: Request, filec_data: FilecCreate):
     filec = Filec(idfilec=idfilec, comprobante=comprobante, nombre=nombre, tipo=tipo)
     return filec
 
-# @app.get("/get_file1/", response_model=List[File1])
-# def get_file1(request: Request):
 
-#     # Verify the provided token
-#     token = request.headers.get("Authorization")
-#     if not token:
-#         raise HTTPException(status_code=401, detail="No token provided")
-#     cursor.execute("SELECT email FROM users WHERE token = %s", (token,))
-#     user_email = cursor.fetchone()
+@app.get("/get_file2/", response_model=List[File2])
+def get_file_2(request: Request):
 
-#     if user_email is None:
-#         raise HTTPException(status_code=401, detail="Invalid token")
+    # Verify the provided token
+    token = request.headers.get("Authorization")
+    if not token:
+        raise HTTPException(status_code=401, detail="No token provided")
+    cursor.execute("SELECT email FROM users WHERE token = %s", (token,))
+    user_email = cursor.fetchone()
 
-#     # The token is valid, get the list of file1
+    if user_email is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
-#     cursor.execute("SELECT * FROM file1")
-#     users_data = cursor.fetchall()
+    # The token is valid, get the list of file2
 
-#     file1 = [User(id_comprobante=id_comprobante, fecha_documento=fecha_documento, documento=email, token=token) for id, email, name, token in users_data]
-#     return file1
+    cursor.execute("SELECT * FROM file2")
+    users_data = cursor.fetchall()
+    file2 = [User(idfile2=idfile2, cuenta=cuenta, nombre=nombre, naturaleza=naturaleza) for idfile2, cuenta, nombre, naturaleza in users_data]
+    return file2
+
+
+@app.get("/get_file1/", response_model=List[File1])
+def get_file1(request: Request):
+
+    # Verify the provided token
+    token = request.headers.get("Authorization")
+    if not token:
+        raise HTTPException(status_code=401, detail="No token provided")
+    cursor.execute("SELECT email FROM users WHERE token = %s", (token,))
+    user_email = cursor.fetchone()
+
+    if user_email is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    # The token is valid, get the list of file1
+
+    cursor.execute("SELECT * FROM file1")
+    users_data = cursor.fetchall()
+
+    file1 = [User(id_comprobante=id_comprobante, fecha_documento=fecha_documento, documento=documento, id_cuenta=id_cuenta,id_cedula=id_cedula,id_c_costos=id_c_costos, factura=factura, valor=valor, tipo=tipo, concepto=concepto, fecha_insert=fecha_insert, fecha_update=fecha_update) for idFile1, id_comprobante, fecha_documento, documento, id_cuenta, id_cedula, id_c_costos, factura, valor, tipo, concepto, fecha_insert, fecha_update in users_data]
+    return file1
 
 
 @app.get("/users/", response_model=List[User])
@@ -201,80 +289,6 @@ def get_users(request: Request):
 
 
 
-# @app.post("/create_project/", response_model=create_Project)
-# def create_project(request: Request, project: create_Project):
-#     """
-#     Create a new project.
-
-#     Args:
-#         request: FastAPI Request object for receiving the user's token.
-#         project: create_Project object containing project data.
-
-#     Returns:
-#         The newly created create_Project object.
-#     """
-#     # Verify the provided token
-#     token = request.headers.get("Authorization")
-#     if not token:
-#         raise HTTPException(status_code=401, detail="No token provided")
-
-#     cursor.execute("SELECT email FROM user WHERE token = %s", (token,))
-#     user_email = cursor.fetchone()
-
-#     if user_email is None:
-#         raise HTTPException(status_code=401, detail="Invalid token")
-
-#     # Verify that the customer ID exists in the customers table
-#     cursor.execute("SELECT id FROM customer WHERE id = %s", (project.customer_id,))
-#     customer = cursor.fetchone()
-
-#     # Create the user if it doesn't exist
-#     if not user_exists(project.created_by_user_id):
-#         cursor.execute("INSERT INTO user (id) VALUES (%s)", (project.created_by_user_id,))
-#         cursor.connection.commit()
-
-#     if customer is None:
-#         raise HTTPException(status_code=400, detail="Invalid customer ID")
-
-#     # Verify that the created_by_user_id exists in the users table
-#     cursor.execute("SELECT id FROM user WHERE id = %s", (project.created_by_user_id,))
-#     user = cursor.fetchone()
-
-#     if user is None:
-#         raise HTTPException(status_code=400, detail="Invalid created_by_user_id")
-
-#     project.useridentifier = 1
-#     # The token is valid, you can add a new project to the database
-#     cursor.execute("""
-#         INSERT INTO project (name, address, customer_id, city, state, zipcode, stage, tenant_id, datecreated, country, address_2, updated_on_date, created_by_user_id, domotz_agent_id, customer_location_id, updated_by_user_id, teams_url, planner_url, enable_teams_url)
-#         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-#     """, (
-#         project.name,
-#         project.address,
-#         project.customer_id,
-#         project.city,
-#         project.state,
-#         project.zipcode,
-#         project.stage,
-#         project.tenant_id,
-#         project.datecreated,
-#         project.country,
-#         project.address_2,
-#         project.updated_on_date,
-#         project.created_by_user_id,
-#         project.domotz_agent_id,
-#         project.customer_location_id,
-#         project.updated_by_user_id,
-#         project.teams_url,
-#         project.planner_url,
-#         project.enable_teams_url
-#     ))
-
-    # Make sure to commit the changes to the database
-    connection.commit()
-
-    # Return the newly created project
-    return project
 
 def user_exists(user_id: int) -> bool:
     """

@@ -45,7 +45,19 @@ class FilecCreate(BaseModel):
     tipo: str
 
 
-
+class File1Create(BaseModel):
+    id_comprobante: Union[int, None]
+    fecha_documento: Union[datetime, None]
+    documento: Union[int, None]
+    id_cuenta: Union[int, None]
+    id_cedula: Union[int, None]
+    id_c_costos: Union[int, None]
+    factura: Union[str, None]
+    valor: Union[int, None]
+    tipo: Union[int, None]
+    concepto: Union[str, None]
+    fecha_insert: Union[datetime, None]
+    fecha_update: Union[datetime, None]
 
 class File1(BaseModel):
     idFile1: Union[int, None]
@@ -64,7 +76,7 @@ class File1(BaseModel):
 
 
 class File2(BaseModel):
-    idfile3: Union[int, None]
+    idfile2: Union[int, None]
     cuenta: Union[int, None]
     nombre: Union[str, None]
     naturaleza: Union[str, None]
