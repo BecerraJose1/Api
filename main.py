@@ -107,7 +107,7 @@ def get_file3(request: Request):
     cursor.execute("SELECT * FROM file3")
     file3_data = cursor.fetchall()
 
-    file3 = [File3(idfile3=idfile3, cedula=cedula, nombre1=nombre1, nombre2=nombre2, apellido1=apellido1, apellido2=apellido2, direccion=direccion, celular=celular, correo=correo, id_ciudad=id_ciudad) for idfile3, cedula, nombre1, nombre2, apellido1, apellido2, direccion, celular, correo, id_ciudad in file3_data ]
+    file3 = [File3(idfile3=idfile3, cedula=cedula, nombre1=nombre1, nombre2=nombre2, apellido1=apellido1, apellido2=apellido2, direccion=direccion, celular=celular, correo=correo, id_ciudad=id_ciudad, tipo_cedula=tipo_cedula) for idfile3, cedula, nombre1, nombre2, apellido1, apellido2, direccion, celular, correo, id_ciudad, tipo_cedula in file3_data ]
     return file3
 
 
@@ -171,7 +171,7 @@ def create_file3(request:Request, file3_data:File3Create):
     
     #El token es válido crea un registro en File1
     try:
-        cursor.execute("INSERT INTO file3 (cedula, nombre1, nombre2,apellido1, apellido2, direccion, celular, correo, id_ciudad) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (file3_data.cedula, file3_data.nombre1, file3_data.nombre2, file3_data.apellido1, file3_data.apellido2, file3_data.direccion, file3_data. celular, file3_data.correo, file3_data.id_ciudad))
+        cursor.execute("INSERT INTO file3 (cedula, nombre1, nombre2,apellido1, apellido2, direccion, celular, correo, id_ciudad, tipo_cedula) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (file3_data.cedula, file3_data.nombre1, file3_data.nombre2, file3_data.apellido1, file3_data.apellido2, file3_data.direccion, file3_data. celular, file3_data.correo, file3_data.id_ciudad, file3_data.tipo_cedula))
         connection.commit()
     except mysql.connector.Error as err:
         print(f"Error during insertion: {err}")
@@ -187,8 +187,8 @@ def create_file3(request:Request, file3_data:File3Create):
         raise HTTPException(status_code=500, detail="Failed to create the file3 record")
 
     # Crea un objeto File3 y lo devuelve como respuesta
-    idfile3, cedula, nombre1, nombre2, apellido1, apellido2, direccion, celular, correo, id_ciudad = file3_record
-    file3 = File3(idfile3=idfile3, cedula=cedula, nombre1=nombre1, nombre2=nombre2, apellido1=apellido1, apellido2=apellido2, direccion=direccion, celular=celular, correo=correo, id_ciudad=id_ciudad)
+    idfile3, cedula, nombre1, nombre2, apellido1, apellido2, direccion, celular, correo, id_ciudad, tipo_cedula = file3_record
+    file3 = File3(idfile3=idfile3, cedula=cedula, nombre1=nombre1, nombre2=nombre2, apellido1=apellido1, apellido2=apellido2, direccion=direccion, celular=celular, correo=correo, id_ciudad=id_ciudad, tipo_cedula=tipo_cedula)
     return file3
 
 
@@ -214,8 +214,8 @@ def edit_file3(request: Request, idfile3: int, file3_data: File3Create):
 
     # El token es válido, actualiza el registro en File3
     try:
-        cursor.execute("UPDATE file3 SET cedula = %s, nombre1 = %s, nombre2 = %s, apellido1 = %s, apellido2 = %s, direccion = %s, celular = %s, correo = %s, id_ciudad = %s WHERE idfile3 = %s",
-                       (file3_data.cedula, file3_data.nombre1, file3_data.nombre2, file3_data.apellido1, file3_data.apellido2, file3_data.direccion, file3_data.celular, file3_data.correo, file3_data.id_ciudad, idfile3))
+        cursor.execute("UPDATE file3 SET cedula = %s, nombre1 = %s, nombre2 = %s, apellido1 = %s, apellido2 = %s, direccion = %s, celular = %s, correo = %s, id_ciudad = %s, tipo_cedula = %s WHERE idfile3 = %s",
+                       (file3_data.cedula, file3_data.nombre1, file3_data.nombre2, file3_data.apellido1, file3_data.apellido2, file3_data.direccion, file3_data.celular, file3_data.correo, file3_data.id_ciudad, file3_data.tipo_cedula, idfile3))
         connection.commit()
     except mysql.connector.Error as err:
         print(f"Error during update: {err}")
@@ -228,8 +228,8 @@ def edit_file3(request: Request, idfile3: int, file3_data: File3Create):
         raise HTTPException(status_code=500, detail="Failed to update the file3 record")
 
     # Crea un objeto File3 y lo devuelve como respuesta
-    idfile3, cedula, nombre1, nombre2, apellido1, apellido2, direccion, celular, correo, id_ciudad = updated_record
-    file3 = File3(idfile3=idfile3, cedula=cedula, nombre1=nombre1, nombre2=nombre2, apellido1=apellido1, apellido2=apellido2, direccion=direccion, celular=celular, correo=correo, id_ciudad=id_ciudad)
+    idfile3, cedula, nombre1, nombre2, apellido1, apellido2, direccion, celular, correo, id_ciudad, tipo_cedula = updated_record
+    file3 = File3(idfile3=idfile3, cedula=cedula, nombre1=nombre1, nombre2=nombre2, apellido1=apellido1, apellido2=apellido2, direccion=direccion, celular=celular, correo=correo, id_ciudad=id_ciudad, tipo_cedula=tipo_cedula)
     return file3
 
 

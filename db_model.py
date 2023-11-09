@@ -92,6 +92,7 @@ class File3(BaseModel):
     celular: Union[str, None]
     correo: Union[str, None]
     id_ciudad: Union[int, None]
+    tipo_cedula: Union[int,None]
 
 
 class File3Create(BaseModel):
@@ -104,6 +105,8 @@ class File3Create(BaseModel):
     celular: Union[str, None]
     correo: Union[str, None]
     id_ciudad: Union[int, None]
+    tipo_cedula: Union[int,None]
+
 
 class File_ciudad(BaseModel):
     idfile_ciudad: int

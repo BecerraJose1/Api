@@ -1,0 +1,9 @@
+# Utiliza una imagen base de MySQL
+FROM mysql:latest
+
+# Copia el archivo SQL combinado al contenedor
+COPY your-combined-sql-file.sql /docker-entrypoint-initdb.d/
+
+# Define las variables de entorno para la contraseña de root y el nombre de la base de datos
+ENV MYSQL_ROOT_PASSWORD = "password"
+ENV MYSQL_DATABASE ="api"
